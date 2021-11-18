@@ -6,6 +6,8 @@ const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
 
 const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
+const { validationResult } = require('express-validator');
+
 const newId = () => {
 	let ultimo = 0;
 	products.forEach(product => {
@@ -36,29 +38,39 @@ const controller = {
 	// Create -  Method to store
 	store: (req, res) => {
 		// Lógica de creado
-		const file = req.file;
-		let product = {};
-		if (!file) {
-			product = {
-				id: newId(),
-				...req.body,
-				image: 'default-image.png'
-			}
+		const resultValidation = validationResult(req);
+
+		if (resultValidation.errors.length > 0) {
+			return res.render('create',
+				{
+					errors: resultValidation.mapped(),
+					oldData: req.body				
+				});
 		} else {
-			product = {
-				id: newId(),
-				...req.body,
-				image: req.file.filename
-			}
-		};
+			const file = req.file;
+			let product = {};
+			if (!file) {
+				product = {
+					id: newId(),
+					...req.body,
+					image: 'default-image.png'
+				}
+			} else {
+				product = {
+					id: newId(),
+					...req.body,
+					image: req.file.filename
+				}
+			};
 
-		//Guardar el producto en el array de productos (Push)
-		products.push(product);
+			//Guardar el producto en el array de productos (Push)
+			products.push(product);
 
-		let jsonProducts = JSON.stringify(products, null, 4);
-		fs.writeFileSync(productsFilePath, jsonProducts);
+			let jsonProducts = JSON.stringify(products, null, 4);
+			fs.writeFileSync(productsFilePath, jsonProducts);
 
-		res.redirect('/')
+			res.redirect('/')
+		}
 	},
 
 	// Update - Form to edit
@@ -74,7 +86,7 @@ const controller = {
 		let updatedFile = products.filter(product => product.id != req.params.id);
 		let productToedit = products.filter(product => product.id == parseInt(req.params.id));
 
-		if(!file){
+		if (!file) {
 			productToedit = {
 				id: asignaid,
 				...req.body,

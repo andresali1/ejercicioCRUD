@@ -408,6 +408,12 @@ hr {
   padding: 0 15px;
 }
 
+.form-danger {
+  color: red;
+  margin-top: -10px;
+  margin-left: 20px;
+}
+
 textarea.form-input {
   min-height: 140px;
   resize: vertical;

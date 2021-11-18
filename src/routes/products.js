@@ -4,6 +4,8 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 
+const { body } = require('express-validator');
+
 // ************ Controller Require ************
 const productsController = require('../controllers/productsController');
 
@@ -20,12 +22,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const validations = [
+    body('name').notEmpty().withMessage('Tenés que escribir un nombre'),
+    body('price').notEmpty().withMessage('No olvidés darle un precio al producto'),
+    body('discount').notEmpty().withMessage('Aclaranos el descuento que tendrá tu producto, si no, poné 0'),
+    body('category').notEmpty().withMessage('Eligé una categoría'),
+    body('description').notEmpty().withMessage('Permitenos conocer un poco más de tu producto'),
+];
+
 /*** GET ALL PRODUCTS ***/ 
 router.get('/', productsController.index); 
 
 /*** CREATE ONE PRODUCT ***/ 
 router.get('/create', productsController.create); 
-router.post('/', upload.single('product-image'), productsController.store); 
+router.post('/', upload.single('product-image'), validations, productsController.store); 
 
 
 /*** GET ONE PRODUCT ***/ 
