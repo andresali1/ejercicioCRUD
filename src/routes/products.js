@@ -24,8 +24,12 @@ const upload = multer({ storage });
 
 const validations = [
     body('name').notEmpty().withMessage('Tenés que escribir un nombre'),
-    body('price').notEmpty().withMessage('No olvidés darle un precio al producto'),
-    body('discount').notEmpty().withMessage('Aclaranos el descuento que tendrá tu producto, si no, poné 0'),
+    body('price')
+    .notEmpty().withMessage('No olvidés darle un precio al producto').bail()
+    .isInt().withMessage('Digitá el precio en números'),
+    body('discount')
+    .notEmpty().withMessage('Aclaranos el descuento que tendrá tu producto, si no, poné 0').bail()
+    .isInt().withMessage('Digitá el descuento en números'),
     body('category').notEmpty().withMessage('Eligé una categoría'),
     body('description').notEmpty().withMessage('Permitenos conocer un poco más de tu producto'),
 ];
